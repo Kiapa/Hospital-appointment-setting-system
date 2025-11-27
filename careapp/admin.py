@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Department, Doctor, Patient, Appointment, Service, ContactMessage
+from .models import Department, Doctor, Patient, Appointment, Service, ContactMessage, AppointmentRequest
 
 
 @admin.register(Department)
@@ -48,3 +48,13 @@ class ContactMessageAdmin(admin.ModelAdmin):
     list_filter = ['is_read', 'created_at']
     list_editable = ['is_read']
     readonly_fields = ['created_at']
+
+
+@admin.register(AppointmentRequest)
+class AppointmentRequestAdmin(admin.ModelAdmin):
+    list_display = ['name', 'email', 'phone', 'appointment_datetime', 'department', 'doctor', 'status', 'is_processed', 'created_at']
+    search_fields = ['name', 'email', 'phone', 'department', 'doctor']
+    list_filter = ['status', 'is_processed', 'department', 'created_at']
+    list_editable = ['status', 'is_processed']
+    readonly_fields = ['created_at']
+    date_hierarchy = 'appointment_datetime'

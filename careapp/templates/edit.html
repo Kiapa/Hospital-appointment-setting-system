@@ -1,0 +1,448 @@
+{% extends 'starter-page.html' %}
+{% load static %}
+
+{% block title %}Edit Appointment - CareCloud{% endblock %}
+{% block page_title %}Edit Appointment{% endblock %}
+{% block page_description %}Update appointment details{% endblock %}
+{% block breadcrumb %}Edit Appointment{% endblock %}
+
+{% block content %}
+<style>
+    .edit-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .edit-card {
+        background: white;
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .edit-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .form-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-header p {
+        color: #6b7280;
+        font-size: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .label-icon {
+        font-size: 1.1rem;
+    }
+
+    .form-control,
+    .form-select,
+    .form-textarea {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+    }
+
+    .form-control:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 120px;
+        font-family: inherit;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .status-options {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .status-option {
+        position: relative;
+    }
+
+    .status-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+
+    .status-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.875rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        font-size: 0.9rem;
+        background: #f9fafb;
+    }
+
+    .status-option input[type="radio"]:checked + .status-label {
+        border-color: #667eea;
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        color: #667eea;
+    }
+
+    .status-label:hover {
+        border-color: #667eea;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 12px;
+        margin-top: 0.5rem;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: #667eea;
+    }
+
+    .checkbox-group label {
+        font-size: 0.95rem;
+        color: #374151;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        border-top: 2px solid #f3f4f6;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .btn-secondary:hover {
+        background: #e5e7eb;
+    }
+
+    .alert {
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .alert-success {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #6ee7b7;
+    }
+
+    .alert-error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+    }
+
+    @media (max-width: 768px) {
+        .edit-container {
+            padding: 1rem;
+        }
+
+        .edit-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .status-options {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="edit-container">
+    <!-- Display Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <span>{% if message.tags == 'success' %}✓{% else %}⚠{% endif %}</span>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="edit-card">
+        <div class="form-header">
+            <h2>✏️ Edit Appointment</h2>
+            <p>Update the appointment details below</p>
+        </div>
+
+        <form method="POST" action="{% url 'edit' obj.id %}">
+            {% csrf_token %}
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">👤</span>
+                        Patient Name
+                    </label>
+                    <input 
+                        type="text" 
+                        name="name" 
+                        class="form-control" 
+                        value="{{ obj.name }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">📧</span>
+                        Email Address
+                    </label>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        class="form-control" 
+                        value="{{ obj.email }}"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">📱</span>
+                        Phone Number
+                    </label>
+                    <input 
+                        type="tel" 
+                        name="phone" 
+                        class="form-control" 
+                        value="{{ obj.phone }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">🕐</span>
+                        Appointment Date & Time
+                    </label>
+                    <input 
+                        type="datetime-local" 
+                        name="appointment_datetime" 
+                        class="form-control" 
+                        value="{{ obj.appointment_datetime|date:'Y-m-d\TH:i' }}"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">🏥</span>
+                        Department
+                    </label>
+                    <input 
+                        type="text" 
+                        name="department" 
+                        class="form-control" 
+                        value="{{ obj.department }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span class="label-icon">👨‍⚕️</span>
+                        Doctor
+                    </label>
+                    <input 
+                        type="text" 
+                        name="doctor" 
+                        class="form-control" 
+                        value="{{ obj.doctor }}"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <span class="label-icon">📋</span>
+                    Status
+                </label>
+                <div class="status-options">
+                    <div class="status-option">
+                        <input 
+                            type="radio" 
+                            id="status-pending" 
+                            name="status" 
+                            value="pending"
+                            {% if obj.status == 'pending' %}checked{% endif %}
+                        >
+                        <label for="status-pending" class="status-label">
+                            🔄 Pending
+                        </label>
+                    </div>
+                    <div class="status-option">
+                        <input 
+                            type="radio" 
+                            id="status-confirmed" 
+                            name="status" 
+                            value="confirmed"
+                            {% if obj.status == 'confirmed' %}checked{% endif %}
+                        >
+                        <label for="status-confirmed" class="status-label">
+                            ✓ Confirmed
+                        </label>
+                    </div>
+                    <div class="status-option">
+                        <input 
+                            type="radio" 
+                            id="status-rejected" 
+                            name="status" 
+                            value="rejected"
+                            {% if obj.status == 'rejected' %}checked{% endif %}
+                        >
+                        <label for="status-rejected" class="status-label">
+                            ✖ Rejected
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <span class="label-icon">💬</span>
+                    Message / Notes
+                </label>
+                <textarea 
+                    name="message" 
+                    class="form-textarea"
+                >{{ obj.message }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input 
+                        type="checkbox" 
+                        id="is_processed" 
+                        name="is_processed" 
+                        value="true"
+                        {% if obj.is_processed %}checked{% endif %}
+                    >
+                    <label for="is_processed">
+                        Mark as processed
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    💾 Save Changes
+                </button>
+                <a href="{% url 'show' %}" class="btn btn-secondary">
+                    ← Back to Appointments
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

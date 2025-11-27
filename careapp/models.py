@@ -24,6 +24,13 @@ class Doctor(models.Model):
         ('orthopedics', 'Orthopedics'),
         ('dermatology', 'Dermatology'),
         ('psychiatry', 'Psychiatry'),
+        ('ophthalmology', 'Ophthalmology'),
+        ('gynecology', 'Gynecology'),
+        ('urology', 'Urology'),
+        ('oncology', 'Oncology'),
+        ('ent', 'ENT (Ear, Nose, Throat)'),
+        ('dental', 'Dental'),
+        ('general', 'General Medicine'),
         ('other', 'Other'),
     ]
     
@@ -127,3 +134,31 @@ class ContactMessage(models.Model):
     
     class Meta:
         ordering = ['-created_at']
+
+
+class AppointmentRequest(models.Model):
+    """Stores appointment requests from the website form before they're converted to actual appointments"""
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('rejected', 'Rejected'),
+    ]
+    
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=15)
+    appointment_datetime = models.DateTimeField()
+    department = models.CharField(max_length=100)
+    doctor = models.CharField(max_length=100)
+    message = models.TextField(blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    is_processed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.name} - {self.appointment_datetime}"
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Appointment Request'
+        verbose_name_plural = 'Appointment Requests'

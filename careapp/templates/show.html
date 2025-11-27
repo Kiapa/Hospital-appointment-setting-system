@@ -1,0 +1,339 @@
+{% extends 'starter-page.html' %}
+{% load static %}
+
+{% block title %}Booked Appointments - CareCloud{% endblock %}
+{% block page_title %}Booked Appointments{% endblock %}
+{% block page_description %}View and manage all your scheduled appointments{% endblock %}
+{% block breadcrumb %}Appointments{% endblock %}
+
+{% block content %}
+<style>
+    .appointments-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .appointments-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 3rem 2rem;
+        color: white;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .appointments-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .appointments-header p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+
+    .appointments-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .appointment-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .appointment-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .appointment-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .appointment-header-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f3f4f6;
+    }
+
+    .patient-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .appointment-status {
+        background: #10b981;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .appointment-details {
+        display: grid;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .detail-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #667eea;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .detail-content {
+        flex: 1;
+    }
+
+    .detail-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.2rem;
+    }
+
+    .detail-value {
+        font-size: 0.95rem;
+        color: #1f2937;
+        font-weight: 500;
+    }
+
+    .message-section {
+        background: #f9fafb;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .message-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .message-text {
+        font-size: 0.9rem;
+        color: #4b5563;
+        line-height: 1.5;
+        font-style: italic;
+    }
+
+    .appointment-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+    }
+
+    .btn-edit:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+
+    .btn-delete:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-pay {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+
+    .btn-pay:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    }
+
+    .empty-icon {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.3;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #6b7280;
+        font-size: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .appointments-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .appointments-header h1 {
+            font-size: 2rem;
+        }
+
+        .appointment-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="appointments-container">
+    <div class="appointments-header">
+        <h1>📅 Your Appointments</h1>
+        <p>View all your scheduled appointments below</p>
+    </div>
+
+    {% if all %}
+    <div class="appointments-grid">
+        {% for appointment in all %}
+        <div class="appointment-card">
+            <div class="appointment-header-section">
+                <h3 class="patient-name">{{ appointment.name }}</h3>
+                <span class="appointment-status">Scheduled</span>
+            </div>
+
+            <div class="appointment-details">
+                <div class="detail-row">
+                    <div class="detail-icon">📧</div>
+                    <div class="detail-content">
+                        <div class="detail-label">Email</div>
+                        <div class="detail-value">{{ appointment.email }}</div>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-icon">📱</div>
+                    <div class="detail-content">
+                        <div class="detail-label">Phone</div>
+                        <div class="detail-value">{{ appointment.phone }}</div>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-icon">🕐</div>
+                    <div class="detail-content">
+                        <div class="detail-label">Date & Time</div>
+                        <div class="detail-value">{{ appointment.appointment_datetime }}</div>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-icon">🏥</div>
+                    <div class="detail-content">
+                        <div class="detail-label">Department</div>
+                        <div class="detail-value">{{ appointment.department }}</div>
+                    </div>
+                </div>
+
+                <div class="detail-row">
+                    <div class="detail-icon">👨‍⚕️</div>
+                    <div class="detail-content">
+                        <div class="detail-label">Doctor</div>
+                        <div class="detail-value">{{ appointment.doctor }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {% if appointment.message %}
+            <div class="message-section">
+                <div class="message-label">Message</div>
+                <div class="message-text">{{ appointment.message }}</div>
+            </div>
+            {% endif %}
+
+            <div class="appointment-actions">
+                <a href="{% url 'edit' appointment.id %}" class="action-btn btn-edit">
+                    ✏️ Edit
+                </a>
+                <a href="{% url 'delete' appointment.id %}" class="action-btn btn-delete">
+                    🗑️ Delete
+                </a>
+                <a href="#" class="action-btn btn-pay">
+                    💳 Pay
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">📅</div>
+        <h3>No Appointments Found</h3>
+        <p>You don't have any scheduled appointments at the moment.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
