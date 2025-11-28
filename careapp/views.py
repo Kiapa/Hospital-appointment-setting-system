@@ -270,7 +270,7 @@ def register(request):
                 user = User.objects.create_user(username=username, email=email, password=password)
                 user.save()
                 messages.success(request, "Account created successfully")
-                return redirect('/')
+                return redirect('login/')
             except:
                 messages.error(request, "Username already exist")
         else:
