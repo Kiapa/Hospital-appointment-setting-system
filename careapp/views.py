@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core.mail import send_mail, BadHeaderError 
 from django.contrib.auth.models import User
+from django.contrib.auth import login,authenticate
 from django.conf import settings
 from datetime import datetime
 import logging
@@ -274,7 +275,29 @@ def register(request):
                 messages.error(request, "Username already exist")
         else:
             messages.error(request, "Passwords do not match")
-        return render(request, 'registration.html')
+        
+     return render(request, 'registration.html')
 
-    
+def login_user(request):
+     if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+
+        user = authenticate(request, username=username, password=password)
+
+        # Check if the user exists
+        if user is not None:
+            # login(request, user)
+            login(request,user)
+            messages.success(request, "You are now logged in!")
+            # Admin
+            if user.is_superuser:
+                return redirect('/appointment')
+
+            # For Normal Users
+            return redirect('/index')
+        else:
+            messages.error(request, "Invalid login credentials")
+
+     return render(request, 'login.html')
 
