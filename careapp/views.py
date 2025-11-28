@@ -1,7 +1,8 @@
 from email import message
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.core.mail import send_mail, BadHeaderError
+from django.core.mail import send_mail, BadHeaderError 
+from django.contrib.auth.models import User
 from django.conf import settings
 from datetime import datetime
 import logging
@@ -256,6 +257,24 @@ def edit(request, id):
         return redirect('show')
 
     return render(request, 'edit.html', {'obj': obj})
+
+def register(request):
+     if request.method == 'POST':
+        username = request.POST['username']
+        email = request.POST['email']
+        password = request.POST['password']
+        confirm_password = request.POST['confirm_password']
+        if password == confirm_password:
+            try:
+                user = User.objects.create_user(username=username, email=email, password=password)
+                user.save()
+                messages.success(request, "Account created successfully")
+                return redirect('/')
+            except:
+                messages.error(request, "Username already exist")
+        else:
+            messages.error(request, "Passwords do not match")
+        return render(request, 'registration.html')
 
     
 
